@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t('history_title') }}</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="lang-{{ lang }}">
+
+<header class="header">
+    <div class="header-inner">
+        <span class="material-icons header-icon">eco</span>
+        <div class="header-text">
+            <h1>{{ t('site_title') }}</h1>
+            <p>{{ t('history_title') }}</p>
+        </div>
+        <nav class="nav">
+            <a href="{{ url_for('index') }}" class="nav-link">{{ t('nav_home') }}</a>
+            <a href="{{ url_for('history') }}" class="nav-link">{{ t('nav_history') }}</a>
+            <div class="lang-switch">
+                <a href="{{ url_for('set_language', lang='en') }}" class="lang-btn {{ 'active' if lang == 'en' else '' }}">EN</a>
+                <a href="{{ url_for('set_language', lang='bn') }}" class="lang-btn {{ 'active' if lang == 'bn' else '' }}">বাং</a>
+            </div>
+        </nav>
+    </div>
+</header>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="flash-box">
+            {% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<main class="container">
+    <div class="card">
+        <h2 class="chart-title">{{ t('history_title') }}</h2>
+
+        {% if records %}
+        <table class="result-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>{{ t('history_date') }}</th>
+                    <th>{{ t('history_total') }} (Tk)</th>
+                    <th>{{ t('history_best') }}</th>
+                    <th>{{ t('history_risk') }}</th>
+                    <th>{{ t('history_actions') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in records %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ r.date }}</td>
+                    <td class="positive">{{ r.total_profit | round(2) }}</td>
+                    <td>{{ r.best_land }}</td>
+                    <td>{{ r.risk }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('delete', record_id=r.id) }}"
+                              style="display:inline;"
+                              onsubmit="return confirm('Delete this record?');">
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <span class="material-icons">delete</span> {{ t('btn_delete') }}
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <span class="material-icons">inbox</span>
+            <p>{{ t('history_empty') }}</p>
+            <a href="{{ url_for('index') }}" class="btn btn-primary">
+                <span class="material-icons">add</span> {{ t('btn_calculate') }}
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</main>
+
+<footer class="footer">
+    <p>{{ t('footer') }}</p>
+</footer>
+
+</body>
+</html>

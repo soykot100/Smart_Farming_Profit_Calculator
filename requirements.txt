@@ -1,0 +1,9 @@
+# Smart Farming Profit Calculator - Dependencies
+# Install with:  pip install -r requirements.txt
+# We do NOT pin exact versions so pip picks the version
+# that already has a pre-built wheel for your Python.
+# This avoids "metadata-generation-failed" errors on Windows.
+
+Flask
+numpy
+scipy

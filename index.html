@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t('site_title') }}</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="lang-{{ lang }}">
+
+<!-- ===== Header with language toggle ===== -->
+<header class="header">
+    <div class="header-inner">
+        <span class="material-icons header-icon">eco</span>
+        <div class="header-text">
+            <h1>{{ t('site_title') }}</h1>
+            <p>{{ t('site_subtitle') }}</p>
+        </div>
+        <nav class="nav">
+            <a href="{{ url_for('index') }}" class="nav-link">{{ t('nav_home') }}</a>
+            <a href="{{ url_for('history') }}" class="nav-link">{{ t('nav_history') }}</a>
+            <div class="lang-switch">
+                <a href="{{ url_for('set_language', lang='en') }}" class="lang-btn {{ 'active' if lang == 'en' else '' }}">EN</a>
+                <a href="{{ url_for('set_language', lang='bn') }}" class="lang-btn {{ 'active' if lang == 'bn' else '' }}">বাং</a>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<!-- ===== Flash messages ===== -->
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="flash-box">
+            {% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<main class="container">
+
+    <!-- ===== Input Form ===== -->
+    <div class="card">
+        <form method="POST" action="{{ url_for('calculate') }}">
+
+            <!-- Step 1: Yield Matrix -->
+            <h2 class="step-title"><span class="step-num">1</span> {{ t('step1_title') }}</h2>
+            <p class="step-help">{{ t('step1_help') }}</p>
+            <table class="input-table">
+                <thead>
+                    <tr>
+                        <th>{{ t('land') }}</th>
+                        {% for crop in crops %}<th>{{ crop }} (kg)</th>{% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for land in lands %}
+                    {% set i = loop.index0 %}
+                    <tr>
+                        <td class="land-label">{{ land }}</td>
+                        {% for crop in crops %}
+                        {% set j = loop.index0 %}
+                        <td><input type="number" name="yield_{{ i }}_{{ j }}" class="num-input"
+                                   value="{{ result.yield_matrix[i][j] if result else 0 }}"
+                                   min="0" step="any"></td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Step 2: Prices -->
+            <h2 class="step-title"><span class="step-num">2</span> {{ t('step2_title') }}</h2>
+            <p class="step-help">{{ t('step2_help') }}</p>
+            <div class="price-row">
+                {% for crop in crops %}
+                {% set j = loop.index0 %}
+                <div class="price-cell">
+                    <label>{{ crop }}</label>
+                    <input type="number" name="price_{{ j }}" class="num-input"
+                           value="{{ result.prices[j] if result else 0 }}"
+                           min="0" step="any">
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Step 3: Costs -->
+            <h2 class="step-title"><span class="step-num">3</span> {{ t('step3_title') }}</h2>
+            <p class="step-help">{{ t('step3_help') }}</p>
+            <div class="price-row">
+                {% for land in lands %}
+                {% set i = loop.index0 %}
+                <div class="price-cell">
+                    <label>{{ land }}</label>
+                    <input type="number" name="cost_{{ i }}" class="num-input"
+                           value="{{ result.costs[i] if result else 0 }}"
+                           min="0" step="any">
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Step 4: Weather -->
+            <h2 class="step-title"><span class="step-num">4</span> {{ t('step4_title') }}</h2>
+            <p class="step-help">{{ t('step4_help') }}</p>
+            <div class="weather-row">
+                <label class="weather-opt">
+                    <input type="radio" name="weather" value="normal" {{ 'checked' if not result or result.weather == 'normal' else '' }}>
+                    <span class="weather-card"><span class="material-icons">wb_sunny</span> {{ t('weather_normal') }}</span>
+                </label>
+                <label class="weather-opt">
+                    <input type="radio" name="weather" value="good" {{ 'checked' if result and result.weather == 'good' else '' }}>
+                    <span class="weather-card"><span class="material-icons">water_drop</span> {{ t('weather_good') }}</span>
+                </label>
+                <label class="weather-opt">
+                    <input type="radio" name="weather" value="drought" {{ 'checked' if result and result.weather == 'drought' else '' }}>
+                    <span class="weather-card"><span class="material-icons">whatshot</span> {{ t('weather_drought') }}</span>
+                </label>
+                <label class="weather-opt">
+                    <input type="radio" name="weather" value="flood" {{ 'checked' if result and result.weather == 'flood' else '' }}>
+                    <span class="weather-card"><span class="material-icons">thunderstorm</span> {{ t('weather_flood') }}</span>
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <span class="material-icons">calculate</span> {{ t('btn_calculate') }}
+            </button>
+        </form>
+    </div>
+
+    <!-- ===== Results Section ===== -->
+    {% if result %}
+
+    <!-- Action buttons -->
+    <div class="result-actions">
+        <form method="POST" action="{{ url_for('save') }}" style="display:inline;">
+            <button type="submit" class="btn btn-success">
+                <span class="material-icons">save</span> {{ t('btn_save') }}
+            </button>
+        </form>
+        <a href="{{ url_for('export_csv') }}" class="btn btn-warning">
+            <span class="material-icons">download</span> {{ t('btn_export') }}
+        </a>
+        <button type="button" class="btn btn-info" onclick="window.print()">
+            <span class="material-icons">print</span> {{ t('btn_print') }}
+        </button>
+    </div>
+
+    <!-- 4 KPI cards -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-label">{{ t('kpi_best_land') }}</div>
+            <div class="kpi-value">{{ result.best_land }}</div>
+            <div class="kpi-sub">{{ result.profit[lands.index(result.best_land)] | round(0) | int }} Tk</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">{{ t('kpi_total_profit') }}</div>
+            <div class="kpi-value">{{ result.profit | sum | round(0) | int }}</div>
+            <div class="kpi-sub">Tk</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">{{ t('kpi_mean_profit') }}</div>
+            <div class="kpi-value">{{ result.statistics.mean | round(0) | int }}</div>
+            <div class="kpi-sub">Tk</div>
+        </div>
+        <div class="kpi-card {{ 'risk-low' if result.risk == 'Low Risk' else ('risk-medium' if result.risk == 'Medium Risk' else 'risk-high') }}">
+            <div class="kpi-label">{{ t('kpi_risk') }}</div>
+            <div class="kpi-value">{{ result.risk }}</div>
+            <div class="kpi-sub">Std: {{ result.statistics.std | round(0) | int }}</div>
+        </div>
+    </div>
+
+    <!-- 2 charts -->
+    <div class="chart-grid">
+        <div class="card">
+            <h3 class="chart-title">{{ t('chart_heatmap') }}</h3>
+            <canvas id="heatmapChart" height="260"></canvas>
+        </div>
+        <div class="card">
+            <h3 class="chart-title">{{ t('chart_profit') }}</h3>
+            <canvas id="profitChart" height="260"></canvas>
+        </div>
+    </div>
+
+    <!-- Result Table -->
+    <div class="card">
+        <h3 class="chart-title">{{ t('result_title') }}</h3>
+        <table class="result-table">
+            <thead>
+                <tr>
+                    <th>{{ t('table_land') }}</th>
+                    <th>{{ t('table_revenue') }}</th>
+                    <th>{{ t('table_profit') }}</th>
+                    <th>{{ t('table_best_crop') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for land in lands %}
+                {% set i = loop.index0 %}
+                <tr class="{{ 'highlight' if land == result.best_land else '' }}">
+                    <td>{{ land }}</td>
+                    <td>{{ result.revenue[i] | round(2) }}</td>
+                    <td class="{{ 'positive' if result.profit[i] >= 0 else 'negative' }}">
+                        {{ result.profit[i] | round(2) }}
+                    </td>
+                    <td>{{ result.best_crops[i] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-label">{{ t('stat_mean') }}</div>
+                <div class="stat-value">{{ result.statistics.mean | round(2) }}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">{{ t('stat_median') }}</div>
+                <div class="stat-value">{{ result.statistics.median | round(2) }}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">{{ t('stat_std') }}</div>
+                <div class="stat-value">{{ result.statistics.std | round(2) }}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">{{ t('stat_range') }}</div>
+                <div class="stat-value">{{ result.statistics.range | round(2) }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- T-Test Section -->
+    <div class="card ttest-card">
+        <h3 class="chart-title">{{ t('ttest_title') }}</h3>
+        <p class="step-help">{{ t('ttest_help') }}</p>
+
+        <div class="ttest-grid">
+            <div class="ttest-stat">
+                <div class="ttest-label">{{ t('ttest_old') }}</div>
+                <div class="ttest-value">{{ result.ttest.traditional_mean | round(1) }} kg</div>
+            </div>
+            <div class="ttest-stat">
+                <div class="ttest-label">{{ t('ttest_new') }}</div>
+                <div class="ttest-value">{{ result.ttest.organic_mean | round(1) }} kg</div>
+            </div>
+            <div class="ttest-stat">
+                <div class="ttest-label">{{ t('ttest_tstat') }}</div>
+                <div class="ttest-value">{{ result.ttest.t_stat | round(3) }}</div>
+            </div>
+            <div class="ttest-stat">
+                <div class="ttest-label">{{ t('ttest_pval') }}</div>
+                <div class="ttest-value">{{ result.ttest.p_val | round(4) }}</div>
+            </div>
+        </div>
+
+        <div class="ttest-result {{ 'positive' if result.ttest.significant else 'negative' }}">
+            <span class="material-icons">{{ 'check_circle' if result.ttest.significant else 'cancel' }}</span>
+            {% if result.ttest.significant %}{{ t('ttest_yes') }}{% else %}{{ t('ttest_no') }}{% endif %}
+        </div>
+
+        <canvas id="ttestChart" height="120"></canvas>
+    </div>
+
+    {% endif %}
+
+</main>
+
+<footer class="footer">
+    <p>{{ t('footer') }}</p>
+</footer>
+
+<!-- ===== JavaScript for charts ===== -->
+{% if result %}
+<script>
+    // Pass data from Python (Flask) to JavaScript
+    const RESULT = {{ result | tojson | safe }};
+    const LANDS = {{ lands | tojson | safe }};
+    const CROPS = {{ crops | tojson | safe }};
+
+    // ----- Chart 1: Heatmap of yield matrix (custom drawn) -----
+    drawHeatmap(document.getElementById('heatmapChart'), RESULT.weather_yield, LANDS, CROPS);
+
+    // ----- Chart 2: Bar chart of profit per land -----
+    new Chart(document.getElementById('profitChart'), {
+        type: 'bar',
+        data: {
+            labels: LANDS,
+            datasets: [{
+                label: 'Profit (Tk)',
+                data: RESULT.profit.map(v => Math.round(v)),
+                backgroundColor: RESULT.profit.map(v => v >= 0 ? '#4CAF50' : '#F44336'),
+                borderRadius: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: false } }
+        }
+    });
+
+    // ----- Chart 3: T-Test comparison -----
+    new Chart(document.getElementById('ttestChart'), {
+        type: 'line',
+        data: {
+            labels: RESULT.ttest.traditional_data.map((_, i) => 'Plot ' + (i + 1)),
+            datasets: [
+                {
+                    label: 'Traditional Fertilizer',
+                    data: RESULT.ttest.traditional_data,
+                    borderColor: '#FF5722',
+                    backgroundColor: 'rgba(255,87,34,0.1)',
+                    tension: 0.3,
+                },
+                {
+                    label: 'Organic Fertilizer',
+                    data: RESULT.ttest.organic_data,
+                    borderColor: '#4CAF50',
+                    backgroundColor: 'rgba(76,175,80,0.1)',
+                    tension: 0.3,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
+            scales: { y: { beginAtZero: false } }
+        }
+    });
+
+    // Helper function: draw a simple heatmap on a canvas
+    function drawHeatmap(canvas, matrix, rowLabels, colLabels) {
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width, H = canvas.height;
+        const padL = 60, padT = 16, padB = 40, padR = 12;
+        const cellW = (W - padL - padR) / matrix[0].length;
+        const cellH = (H - padT - padB) / matrix.length;
+        let maxVal = 0;
+        for (let i = 0; i < matrix.length; i++)
+            for (let j = 0; j < matrix[0].length; j++)
+                if (matrix[i][j] > maxVal) maxVal = matrix[i][j];
+
+        ctx.clearRect(0, 0, W, H);
+        for (let i = 0; i < matrix.length; i++) {
+            for (let j = 0; j < matrix[0].length; j++) {
+                const v = matrix[i][j];
+                const r = maxVal > 0 ? v / maxVal : 0;
+                const R = Math.round(255 - (255 - 46) * r);
+                const G = Math.round(255 - (255 - 125) * r);
+                const B = Math.round(255 - (255 - 50) * r);
+                ctx.fillStyle = `rgb(${R},${G},${B})`;
+                ctx.fillRect(padL + j * cellW, padT + i * cellH, cellW - 3, cellH - 3);
+                ctx.fillStyle = r > 0.5 ? '#FFF' : '#333';
+                ctx.font = 'bold 13px Inter';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(Math.round(v),
+                    padL + j * cellW + (cellW - 3) / 2,
+                    padT + i * cellH + (cellH - 3) / 2);
+            }
+        }
+        ctx.fillStyle = '#333';
+        ctx.font = '12px Inter';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        for (let i = 0; i < rowLabels.length; i++) {
+            ctx.fillText(rowLabels[i], padL - 6, padT + i * cellH + (cellH - 3) / 2);
+        }
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        for (let j = 0; j < colLabels.length; j++) {
+            ctx.fillText(colLabels[j], padL + j * cellW + (cellW - 3) / 2, padT + matrix.length * cellH + 8);
+        }
+    }
+</script>
+{% endif %}
+
+</body>
+</html>

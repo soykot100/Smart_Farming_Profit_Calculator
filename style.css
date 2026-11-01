@@ -1,0 +1,392 @@
+/* ===== Smart Farming Profit Calculator - Stylesheet ===== */
+/* Fresh Green theme - simple and clean */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Inter', 'Hind Siliguri', sans-serif;
+    background: #F5F5F0;
+    color: #1A1A1A;
+    line-height: 1.6;
+}
+body.lang-bn { font-family: 'Hind Siliguri', 'Inter', sans-serif; }
+
+/* ===== Header ===== */
+.header {
+    background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 100%);
+    color: white;
+    padding: 16px 24px;
+}
+.header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.header-icon { font-size: 40px; color: #FFC107; }
+.header-text { flex: 1; }
+.header h1 { font-size: 20px; font-weight: 700; }
+.header p { font-size: 12px; opacity: 0.9; }
+
+/* ===== Nav and language ===== */
+.nav { display: flex; align-items: center; gap: 8px; }
+.nav-link {
+    color: rgba(255,255,255,0.9);
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+}
+.nav-link:hover { background: rgba(255,255,255,0.15); }
+.lang-switch {
+    display: flex; gap: 4px;
+    padding: 4px 8px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 6px;
+}
+.lang-btn {
+    padding: 4px 10px;
+    border-radius: 4px;
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+}
+.lang-btn.active { background: white; color: #2E7D32; }
+
+/* ===== Container ===== */
+.container {
+    max-width: 1100px;
+    margin: 24px auto;
+    padding: 0 24px 60px;
+}
+
+/* ===== Card ===== */
+.card {
+    background: #FFFFFF;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+/* ===== Step Title ===== */
+.step-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #1B5E20;
+    font-size: 17px;
+    margin: 20px 0 6px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #E0E0D8;
+}
+.step-title:first-child { margin-top: 0; }
+.step-num {
+    width: 28px; height: 28px;
+    background: #2E7D32; color: white;
+    border-radius: 50%;
+    font-size: 14px; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.step-help {
+    color: #666;
+    font-size: 13px;
+    margin-bottom: 12px;
+    padding-left: 38px;
+}
+
+/* ===== Input Table ===== */
+.input-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+}
+.input-table th, .input-table td {
+    border: 1px solid #E0E0D8;
+    padding: 8px 10px;
+    text-align: center;
+}
+.input-table th {
+    background: #2E7D32;
+    color: white;
+    font-weight: 600;
+    font-size: 13px;
+}
+.land-label {
+    background: #E8F5E9;
+    color: #1B5E20;
+    font-weight: 600;
+}
+
+/* ===== Number Input ===== */
+.num-input {
+    width: 90px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
+    font-family: inherit;
+}
+.num-input:focus {
+    outline: none;
+    border-color: #2E7D32;
+    box-shadow: 0 0 0 3px rgba(46,125,50,0.15);
+}
+
+/* ===== Price Row ===== */
+.price-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.price-cell {
+    background: #FAFAF7;
+    border: 1px solid #E0E0D8;
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+}
+.price-cell label {
+    display: block;
+    font-weight: 600;
+    color: #1B5E20;
+    margin-bottom: 6px;
+}
+
+/* ===== Weather Options ===== */
+.weather-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+}
+.weather-opt { cursor: pointer; }
+.weather-opt input { display: none; }
+.weather-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 6px;
+    border: 2px solid #E0E0D8;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.weather-card .material-icons { font-size: 24px; color: #666; }
+.weather-opt input:checked + .weather-card {
+    border-color: #2E7D32;
+    background: #E8F5E9;
+}
+.weather-opt input:checked + .weather-card .material-icons { color: #2E7D32; }
+
+/* ===== Buttons ===== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.btn .material-icons { font-size: 18px; }
+.btn-primary { background: #2E7D32; color: white; }
+.btn-primary:hover { background: #1B5E20; }
+.btn-success { background: #388E3C; color: white; }
+.btn-success:hover { background: #2E7D32; }
+.btn-warning { background: #F57C00; color: white; }
+.btn-warning:hover { background: #E65100; }
+.btn-info { background: #1976D2; color: white; }
+.btn-info:hover { background: #1565C0; }
+.btn-danger { background: #D32F2F; color: white; }
+.btn-danger:hover { background: #B71C1C; }
+.btn-sm { padding: 6px 10px; font-size: 12px; }
+.btn-sm .material-icons { font-size: 14px; }
+
+/* ===== Result Actions ===== */
+.result-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+/* ===== KPI Cards ===== */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 16px;
+}
+.kpi-card {
+    background: #FFFFFF;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    border-left: 4px solid #2E7D32;
+}
+.kpi-card.risk-low { border-left-color: #388E3C; }
+.kpi-card.risk-medium { border-left-color: #F57C00; }
+.kpi-card.risk-high { border-left-color: #D32F2F; }
+.kpi-label {
+    font-size: 11px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+.kpi-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1B5E20;
+    margin: 4px 0;
+    line-height: 1.1;
+}
+.kpi-sub { font-size: 12px; color: #888; }
+
+/* ===== Chart Grid ===== */
+.chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+.chart-title {
+    font-size: 15px;
+    color: #1B5E20;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+/* ===== Result Table ===== */
+.result-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+}
+.result-table th, .result-table td {
+    border: 1px solid #E0E0D8;
+    padding: 10px;
+    text-align: center;
+}
+.result-table th {
+    background: #2E7D32;
+    color: white;
+    font-weight: 600;
+}
+.result-table tbody tr:nth-child(even) { background: #FAFAF7; }
+.result-table tr.highlight {
+    background: #FFF8E1;
+    font-weight: 700;
+}
+.positive { color: #388E3C; font-weight: 600; }
+.negative { color: #D32F2F; font-weight: 600; }
+
+/* ===== Stats Grid ===== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+.stat-box {
+    background: #FAFAF7;
+    border: 1px solid #E0E0D8;
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+}
+.stat-label { font-size: 12px; color: #666; margin-bottom: 4px; }
+.stat-value { font-size: 18px; font-weight: 700; color: #1B5E20; }
+
+/* ===== T-Test Section ===== */
+.ttest-card { border-top: 4px solid #2E7D32; }
+.ttest-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.ttest-stat {
+    background: #FAFAF7;
+    border: 1px solid #E0E0D8;
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+}
+.ttest-label { font-size: 11px; color: #666; margin-bottom: 4px; }
+.ttest-value { font-size: 18px; font-weight: 700; color: #1B5E20; }
+.ttest-result {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    margin-bottom: 14px;
+}
+.ttest-result.positive { background: #E8F5E9; color: #388E3C; }
+.ttest-result.negative { background: #FFEBEE; color: #D32F2F; }
+
+/* ===== Flash Messages ===== */
+.flash-box { max-width: 1100px; margin: 16px auto 0; padding: 0 24px; }
+.flash {
+    background: #E8F5E9;
+    color: #388E3C;
+    padding: 12px 18px;
+    border-radius: 6px;
+    border-left: 4px solid #388E3C;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* ===== Empty State ===== */
+.empty-state {
+    text-align: center;
+    padding: 40px 24px;
+    color: #666;
+}
+.empty-state .material-icons {
+    font-size: 64px;
+    color: #ccc;
+    margin-bottom: 12px;
+}
+.empty-state p { margin-bottom: 16px; }
+
+/* ===== Footer ===== */
+.footer {
+    background: #1B5E20;
+    color: rgba(255,255,255,0.85);
+    text-align: center;
+    padding: 16px;
+    font-size: 13px;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 800px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .chart-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .ttest-grid { grid-template-columns: repeat(2, 1fr); }
+    .weather-row { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ===== Print styles (for PDF export via Print) ===== */
+@media print {
+    .header, .footer, .result-actions, .nav, .lang-switch, .flash-box { display: none !important; }
+    body { background: white; color: black; }
+    .container { max-width: 100%; margin: 0; padding: 0; }
+    .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+    .kpi-card, .stat-box, .ttest-stat { border: 1px solid #ccc; }
+}
